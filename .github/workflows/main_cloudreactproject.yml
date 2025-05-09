@@ -11,14 +11,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18.x' # You can use 18.x or 20.x; 22 might be too new
+          node-version: '18.x'
 
-      - name: Install dependencies and build
+      - name: Install dependencies and build React app
         run: |
           npm install
           npm run build
@@ -34,19 +35,17 @@ jobs:
     needs: build
     environment:
       name: 'Production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
-      - name: Download artifact from build
+      - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: react-build
 
-      - name: 'Deploy to Azure Web App'
+      - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'cloudreactproject'
-          slot-name: 'Production'
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_4805E232257945F0B5D63685B6206A8B }}
